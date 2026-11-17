@@ -1,7 +1,7 @@
 [project]
 name = "udyamguide"
 version = "0.1.0"
-description = "AI-powered platform for MSME schemes, loans, and delayed-payment protection."
+description = "UdyamGuide – An AI-powered assistant that answers MSME queries using verified government documents and calculates delayed payment interest."
 readme = "README.md"
 authors = [
     { name = "Keerthana", email = "keerthanadamodaran026@gmail.com" }
