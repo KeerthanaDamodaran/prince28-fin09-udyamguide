@@ -1,3 +1,4 @@
+
 [
   {
     "id": "001",
@@ -7,7 +8,8 @@
     "benefit": "Online MSME registration and access to MSME support measures",
     "max_amount": "",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2020-07-01"
+    "effective_from": "2020-07-01",
+    "source_url": "https://udyamregistration.gov.in/Important.aspx"
   },
   {
     "id": "002",
@@ -17,7 +19,8 @@
     "benefit": "Credit guarantee cover for eligible collateral-free lending",
     "max_amount": "Rs 10 crore",
     "enterprise_class": "Micro and Small",
-    "effective_from": "2025-04-01"
+    "effective_from": "2025-04-01",
+    "source_url": "https://www.cgtmse.in/Default/ViewFile/?id=1743176302611_CGTMSE+-+Scheme+Document+CGS+I_updated+as+on+Apr+1+2025.pdf&path=Page"
   },
   {
     "id": "003",
@@ -27,7 +30,8 @@
     "benefit": "Bank-financed margin money subsidy for new eligible projects",
     "max_amount": "Rs 50 lakh for manufacturing and Rs 20 lakh for services",
     "enterprise_class": "Micro",
-    "effective_from": "2008-04-01"
+    "effective_from": "2008-04-01",
+    "source_url": "https://www.kviconline.gov.in/pmegpeportal/dashboard/notification/Revised_PMEGP_Scheme_Guidelines_07122023_compressed.pdf"
   },
   {
     "id": "004",
@@ -37,7 +41,8 @@
     "benefit": "Online filing and monitoring of delayed-payment complaints",
     "max_amount": "",
     "enterprise_class": "Micro and Small",
-    "effective_from": "2017-05-01"
+    "effective_from": "2017-05-01",
+    "source_url": "https://samadhaan.msme.gov.in/"
   },
   {
     "id": "005",
@@ -47,7 +52,8 @@
     "benefit": "Interest on delayed payments where no written agreement exists or the agreed period is longer than statutory limits",
     "max_amount": "Three times the RBI bank rate",
     "enterprise_class": "Micro and Small",
-    "effective_from": "2006-10-02"
+    "effective_from": "2006-10-02",
+    "source_url": "https://www.indiacode.nic.in/bitstream/123456789/19412/1/msme_act_2006.pdf"
   },
   {
     "id": "006",
@@ -57,7 +63,8 @@
     "benefit": "Support for infrastructure, capability building and common facilities",
     "max_amount": "",
     "enterprise_class": "Micro and Small",
-    "effective_from": "2020-04-01"
+    "effective_from": "2020-04-01",
+    "source_url": "https://www.dcmsme.gov.in/CLCS_TUS_Scheme/Cluster-Development-Programme/Scheme_Guideline.aspx"
   },
   {
     "id": "007",
@@ -67,7 +74,8 @@
     "benefit": "Certification, handholding and financial support for ZED assessment",
     "max_amount": "",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2016-01-01"
+    "effective_from": "2016-01-01",
+    "source_url": "https://zed.msme.gov.in/"
   },
   {
     "id": "008",
@@ -77,7 +85,8 @@
     "benefit": "Support for lean implementation and productivity improvement",
     "max_amount": "",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2015-04-01"
+    "effective_from": "2015-04-01",
+    "source_url": "https://lean.msme.gov.in/Home/FAQs"
   },
   {
     "id": "009",
@@ -87,7 +96,8 @@
     "benefit": "Training in entrepreneurship, management and industrial skills",
     "max_amount": "",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2015-04-01"
+    "effective_from": "2015-04-01",
+    "source_url": "https://my.msme.gov.in/files/assets/pdf/v2.0%20-2025-%20Scheme%20booklet%20Eng-14.02.2025.pdf"
   },
   {
     "id": "010",
@@ -97,7 +107,8 @@
     "benefit": "Guidance and subsidy support for quality, environmental and energy measures",
     "max_amount": "",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2022-07-01"
+    "effective_from": "2022-07-01",
+    "source_url": "https://zed.msme.gov.in/faqs"
   },
   {
     "id": "011",
@@ -107,7 +118,8 @@
     "benefit": "Technical consultancy, training and project support",
     "max_amount": "",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "1956-01-01"
+    "effective_from": "1956-01-01",
+    "source_url": "https://www.msme.gov.in/sites/default/files/MSME-ANNUAL-REPORT-2024-25-ENGLISH.pdf"
   },
   {
     "id": "012",
@@ -117,7 +129,8 @@
     "benefit": "Capital subsidy linked to approved technology upgradation loans",
     "max_amount": "As prescribed by the applicable scheme guidelines",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2005-10-01"
+    "effective_from": "2005-10-01",
+    "source_url": "https://my.msme.gov.in/MyMsme/Reg/COM_ClcssAppForm.aspx"
   },
   {
     "id": "013",
@@ -127,7 +140,8 @@
     "benefit": "Support for technology centres and incubation of rural enterprises",
     "max_amount": "",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2015-05-01"
+    "effective_from": "2015-05-01",
+    "source_url": "https://www.dashboard.msme.gov.in/aspire.aspx"
   },
   {
     "id": "014",
@@ -137,7 +151,8 @@
     "benefit": "Digital access to grievance resolution and MSME support services",
     "max_amount": "",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2021-01-01"
+    "effective_from": "2021-01-01",
+    "source_url": "https://champions.gov.in/"
   },
   {
     "id": "015",
@@ -147,7 +162,8 @@
     "benefit": "Composite bank loans covering up to 85 percent of project cost",
     "max_amount": "Rs 1 crore",
     "enterprise_class": "Micro and Small",
-    "effective_from": "2016-04-05"
+    "effective_from": "2016-04-05",
+    "source_url": "https://www.financialservices.gov.in/stand-india-scheme-supi"
   },
   {
     "id": "016",
@@ -157,7 +173,8 @@
     "benefit": "Additional credit with government-backed guarantee support",
     "max_amount": "Scheme-period limits; based on eligible outstanding credit",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2020-05-20"
+    "effective_from": "2020-05-20",
+    "source_url": "https://www.ncgtc.in/content/products/0/20260707/FAQs_ECLGS_5_0_updated_as_on_07072026_837f5bf60c.pdf"
   },
   {
     "id": "017",
@@ -167,7 +184,8 @@
     "benefit": "Electronic discounting of trade receivables against invoices",
     "max_amount": "Based on approved credit and invoice value",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2014-01-01"
+    "effective_from": "2014-01-01",
+    "source_url": "https://www.rbi.org.in/Scripts/bs_viewcontent.aspx?Id=3504"
   },
   {
     "id": "018",
@@ -177,7 +195,8 @@
     "benefit": "Online access to government procurement opportunities",
     "max_amount": "",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2016-08-09"
+    "effective_from": "2016-08-09",
+    "source_url": "https://gem.gov.in/"
   },
   {
     "id": "019",
@@ -187,7 +206,8 @@
     "benefit": "Enterprise-focused training and improved access to skills",
     "max_amount": "",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2017-04-01"
+    "effective_from": "2017-04-01",
+    "source_url": "https://unnati.cbc.gov.in/"
   },
   {
     "id": "020",
@@ -197,6 +217,7 @@
     "benefit": "Classification as micro, small or medium enterprise",
     "max_amount": "Medium: investment up to Rs 125 crore and turnover up to Rs 500 crore",
     "enterprise_class": "Micro, Small and Medium",
-    "effective_from": "2025-04-01"
+    "effective_from": "2025-04-01",
+    "source_url": "https://udyamregistration.gov.in/Important.aspx"
   }
 ]
