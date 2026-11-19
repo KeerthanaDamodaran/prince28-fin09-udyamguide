@@ -56,3 +56,75 @@ The planner chose a Sequential Scan because the table contains only around 20 ro
 When would it switch to the GIN index? (1 line)
 
 When the table grows large enough that using the GIN index is estimated to be cheaper than scanning the entire table.
+
+
+## D04 · Docker, Compose and tests
+
+### The image
+
+```text
+paste the output of: docker images udyamguide:dev
+IMAGE            ID             DISK USAGE   CONTENT SIZE   EXTRA
+udyamguide:dev   c7de1319de16        300MB           70MB
+paste the output of: docker run --rm udyamguide:dev id
+uid=999(app) gid=999(app) groups=999(app)
+```
+
+- Size: 300 MB (target: under 400 MB)
+- First build: 5.9 s. After changing one line of code: 12.6 s.
+- Which step said CACHED, and why? The `uv sync` dependency-related step was cached in the first build because Docker reused a previously built layer, but it ran again in the second build because the source COPY step invalidated the cache.
+
+### The stack
+
+```text
+paste the output of: docker compose ps -a
+NAME                   IMAGE                    COMMAND                  SERVICE   CREATED         STATUS                      PORTS
+udyamguide-api-1       udyamguide-api           "sh -c 'exec uvicorn…"   api       9 minutes ago   Up 56 seconds (healthy)     8000/tcp
+udyamguide-db-1        pgvector/pgvector:pg17   "docker-entrypoint.s…"   db        9 minutes ago   Up 9 minutes (healthy)      0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+udyamguide-migrate-1   udyamguide-migrate       "sh -c 'alembic upgr…"   migrate   9 minutes ago   Exited (0) 56 seconds ago
+udyamguide-redis-1     redis:7-alpine           "docker-entrypoint.s…"   redis     9 minutes ago   Up 9 minutes (healthy)      0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+
+paste the last line of: docker compose logs migrate   (first up, then after down + up)
+
+migrate-1  | records=20 inserted=0 updated=0 unchanged=20
+```
+
+### Breaking the database on purpose
+
+```text
+db stopped:  /health → paste
+db stopped:  /ready  → paste
+db started:  /ready  → paste
+
+[+] stop 1/1
+ ✔ Container udyamguide-db-1 Stopped                                                             0.5s
+{"status":"ok","app":"udyamguide","env":"local"}{"status":"not_ready","checks":{"database":false}}
+(udyamguide) PS D:\Genai-training\prince28-fin09-udyamguide> docker compose start db
+>> curl.exe -s localhost:8000/ready
+[+] start 1/1
+ ✔ Container udyamguide-db-1 Started                                                             0.4s
+{"status":"ready","checks":{"database":true}}
+```
+
+Why should a load balancer stop sending traffic here but not restart the app? (2 lines)
+
+A load balancer should stop sending traffic to an unhealthy instance to prevent users from receiving errors.
+It doesn't restart the app because its job is to route traffic; restarting and recovery are handled by the orchestrator (e.g., Docker/Kubernetes).
+
+### Tests and coverage
+
+```text
+uv run poe test              → paste the last line
+16 passed in 0.29s
+
+uv run poe test-integration  → paste the last line
+7 passed in 2.66s
+
+coverage TOTAL, unit only    → paste
+16 passed, 7 skipped in 2.00s
+
+coverage TOTAL, with integration tests → paste
+23 passed in 4.05s
+```
+
+Two files or lines my coverage report says are never run, and whether they matter: (2 lines)
