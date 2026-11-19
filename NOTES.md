@@ -62,13 +62,14 @@ When the table grows large enough that using the GIN index is estimated to be ch
 
 ### The image
 
-```text
-paste the output of: docker images udyamguide:dev
+The output of: docker images udyamguide:dev
+
 IMAGE            ID             DISK USAGE   CONTENT SIZE   EXTRA
 udyamguide:dev   c7de1319de16        300MB           70MB
-paste the output of: docker run --rm udyamguide:dev id
+
+The output of: docker run --rm udyamguide:dev id
 uid=999(app) gid=999(app) groups=999(app)
-```
+
 
 - Size: 300 MB (target: under 400 MB)
 - First build: 5.9 s. After changing one line of code: 12.6 s.
@@ -76,25 +77,31 @@ uid=999(app) gid=999(app) groups=999(app)
 
 ### The stack
 
-```text
-paste the output of: docker compose ps -a
+The output of: docker compose ps -a
+
 NAME                   IMAGE                    COMMAND                  SERVICE   CREATED         STATUS                      PORTS
 udyamguide-api-1       udyamguide-api           "sh -c 'exec uvicorn…"   api       9 minutes ago   Up 56 seconds (healthy)     8000/tcp
 udyamguide-db-1        pgvector/pgvector:pg17   "docker-entrypoint.s…"   db        9 minutes ago   Up 9 minutes (healthy)      0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
 udyamguide-migrate-1   udyamguide-migrate       "sh -c 'alembic upgr…"   migrate   9 minutes ago   Exited (0) 56 seconds ago
 udyamguide-redis-1     redis:7-alpine           "docker-entrypoint.s…"   redis     9 minutes ago   Up 9 minutes (healthy)      0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
 
-paste the last line of: docker compose logs migrate   (first up, then after down + up)
+The last line of: docker compose logs migrate   (first up, then after down + up)
 
 migrate-1  | records=20 inserted=0 updated=0 unchanged=20
-```
+
 
 ### Breaking the database on purpose
 
-```text
-db stopped:  /health → paste
-db stopped:  /ready  → paste
-db started:  /ready  → paste
+
+db stopped:  /health
+db stopped:  /ready
+db started:  /ready
+
+API stopped: /health → {"status":"ok","app":"udyamguide","env":"local"}
+
+DB stopped: /ready → {"status":"not_ready","checks":{"database":false}}
+
+DB started: /ready → {"status":"ready","checks":{"database":true}}
 
 [+] stop 1/1
  ✔ Container udyamguide-db-1 Stopped                                                             0.5s
@@ -104,7 +111,7 @@ db started:  /ready  → paste
 [+] start 1/1
  ✔ Container udyamguide-db-1 Started                                                             0.4s
 {"status":"ready","checks":{"database":true}}
-```
+
 
 Why should a load balancer stop sending traffic here but not restart the app? (2 lines)
 
@@ -113,18 +120,21 @@ It doesn't restart the app because its job is to route traffic; restarting and r
 
 ### Tests and coverage
 
-```text
-uv run poe test              → paste the last line
-16 passed in 0.29s
 
-uv run poe test-integration  → paste the last line
-7 passed in 2.66s
+uv run poe test              → 16 passed in 0.29s
 
-coverage TOTAL, unit only    → paste
-16 passed, 7 skipped in 2.00s
 
-coverage TOTAL, with integration tests → paste
-23 passed in 4.05s
-```
+uv run poe test-integration  → 7 passed in 2.66s
+
+
+coverage TOTAL, unit only    → 16 passed, 7 skipped in 2.00s
+
+
+coverage TOTAL, with integration tests → 23 passed in 4.05s
+
 
 Two files or lines my coverage report says are never run, and whether they matter: (2 lines)
+
+Coverage reports show which lines your tests never executed. Those lines may be untested code, not necessarily bugs.
+
+They matter if they contain important logic (error handling, edge cases, validation); they may not matter much if they're startup code, logging, or rarely used branches.
