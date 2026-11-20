@@ -138,3 +138,42 @@ Two files or lines my coverage report says are never run, and whether they matte
 Coverage reports show which lines your tests never executed. Those lines may be untested code, not necessarily bugs.
 
 They matter if they contain important logic (error handling, edge cases, validation); they may not matter much if they're startup code, logging, or rarely used branches.
+
+# D05 · CI/CD and going live
+
+- **Live URL:** https://udyamguide.onrender.com
+- **CI run for PR #4:** https://github.com/KeerthanaDamodaran/prince28-fin09-udyamguide/actions
+- **First automatic deploy:** 2:45 PM (approx.)
+- **Merge clicked:** 2:45 PM → **Smoke test passed:** 2:47 PM → **Lead time:** ~2 min
+
+## Smoke test output from that CD run
+
+```text
+waiting: … 200 <old sha>
+waiting: … 200 <old sha>
+waiting: … 200 <new sha>
+Smoke test passed
+```
+
+## Rollback drill
+
+- **Rolled back to SHA:** `ce83d7778803cab285e56e305da8cd4d6e64dfa2`
+  - Started: 3:30 PM (approx.)
+  - Smoke passed: 3:34 PM (approx.)
+  - Duration: ~4 min
+- **Rolled forward to SHA:** `d6a440fd774013b2bc7b1ef894d8b516ac2be008`
+  - Duration: ~3 min
+
+### Why did the database stay on the newer schema during rollback?
+
+Migrations only move the database forward; deploying an older application image does not undo them. This is safe because the older code can still work with the newer, backward-compatible database schema.
+
+## Where my secrets live
+
+- **Neon connection string:** GitHub Secret `DATABASE_URL` + Render environment variables. Not in Git or the Docker image.
+- **Render deploy hook:** GitHub Secret `RENDER_DEPLOY_HOOK` only.
+
+## Monitoring
+
+- **UptimeRobot:** Checks `/health` every 5 minutes; alerts go to my email.
+- **One thing that would make my live app faster on its first request:** Use an always-on Render instance to prevent cold starts caused by the free service spinning down.
