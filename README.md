@@ -1,5 +1,13 @@
 # UdyamGuide
 
+[![CI](https://github.com/KeerthanaDamodaran/prince28-fin09-udyamguide/actions/workflows/ci.yml/badge.svg)](https://github.com/KeerthanaDamodaran/prince28-fin09-udyamguide/actions/workflows/ci.yml)
+[![Live](https://img.shields.io/website?url=https%3A%2F%2Fudyamguide.onrender.com%2Fhealth&label=live)](https://udyamguide.onrender.com/docs)
+[![Uptime (30 days)](https://img.shields.io/uptimerobot/ratio/m804746213-d500ad11e12b154fc66a4bcd?style=flat)](https://udyamguide.onrender.com/health)
+
+**Status:** Week 1 complete · live at https://udyamguide.onrender.com
+
+**Live:** [https://udyamguide.onrender.com](https://udyamguide.onrender.com) · [API docs](https://udyamguide.onrender.com/docs) · [health](https://udyamguide.onrender.com/health)
+
 **UdyamGuide** is an AI-powered assistant that helps micro and small enterprises discover government schemes, collateral-free loans, and protection against delayed payments using verified government documents and citations.
 
 **Status:** Day 1 – Foundation (FastAPI skeleton, project structure, and quality gates). Live deployment planned from Day 5.
