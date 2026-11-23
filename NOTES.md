@@ -177,3 +177,61 @@ Migrations only move the database forward; deploying an older application image 
 
 - **UptimeRobot:** Checks `/health` every 5 minutes; alerts go to my email.
 - **One thing that would make my live app faster on its first request:** Use an always-on Render instance to prevent cold starts caused by the free service spinning down.
+
+## D05 · CI/CD and Going Live
+
+### Rollback Drill
+If a faulty deployment reaches production, I will identify the last known stable commit, revert the faulty commit, push the changes, and allow the CI/CD pipeline to redeploy the stable version. I will then run the smoke test and verify that the `/health` endpoint returns HTTP 200.
+
+### Lead Time
+Lead time is the time taken for a code change to move from development to production deployment. For this project, I tracked the process from committing the code, pushing it to GitHub, passing CI checks, merging into main, and deploying to Render.
+
+### Deployment Verification
+- CI checks passed.
+- CD workflow completed.
+- Docker image deployed to Render.
+- Smoke test passed.
+- Production `/health` endpoint returned HTTP 200.
+- Live version matched the latest main commit.
+
+# D06 · Collecting the corpus
+
+- **Start target:** Central scheme guidelines + MSMED Act
+- **Collected today:** 10 files, 139 pages, 13.4 MB
+- **Doors used:** URL list / by hand
+
+## Licence check
+
+| Source | Licence or terms, in my words | May I show full text in answers? |
+|---|---|---|
+| Government scheme documents | Publicly accessible government documents; reuse terms not verified | No, prefer summaries and citations |
+| RBI documents | Official regulatory information; verify reuse terms | No, summarize and cite the original |
+| MSME portals | Public portal information; reuse terms not verified | No, cite official source |
+
+## robots.txt
+
+- **Site:** [Government and MSME source websites. Their robots.txt rules were respected.](https://www.cgtmse.in/)
+- **What it says:** User-agent: *
+Allow: /
+Sitemap: https://www.cgtmse.in/site-map.xml
+Crawling restrictions were checked by the collector before fetching pages.
+- **Was anything blocked for my bot?** No blocked files in today's final report (0 blocked, 0 failed). I respected robots.txt and didn't bypass restrictions.
+
+## Kill and resume
+
+- **Run 1:** I pressed Ctrl+C after 10 files.
+- **Run 2:** downloaded=0 skipped=10
+- **Run 3:** downloaded=0 skipped=10
+
+## Capacity (from docs/CAPACITY.md)
+
+- **Tokens per page, measured:** 414
+- **Full corpus:** 1.03 M tokens, 2,976 chunks, embedding about Rs 17, vectors 9 MB
+
+- **The number that surprised me most, and why:**
+
+  The corpus was only 13.4 MB but covered 139 pages. The actual embedding and vector storage requirements can be larger than the raw file size, so I need to measure them after chunking.
+
+## One thing that went wrong today, and how I fixed it
+
+The CGTMSE sitemap was malformed and couldn't be parsed. Instead of repeatedly retrying it, I switched to collecting documents through verified individual URLs and manual collection, while respecting website restrictions.
