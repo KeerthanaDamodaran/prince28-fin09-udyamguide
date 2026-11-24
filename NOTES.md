@@ -235,3 +235,113 @@ Crawling restrictions were checked by the collector before fetching pages.
 ## One thing that went wrong today, and how I fixed it
 
 The CGTMSE sitemap was malformed and couldn't be parsed. Instead of repeatedly retrying it, I switched to collecting documents through verified individual URLs and manual collection, while respecting website restrictions.
+
+## D07 · Parsing My Corpus
+
+1. ## Current Dataset Status
+
+Source entries in data/sources.csv: 10
+
+Files downloaded in the latest fetch: 1
+
+Files skipped in the latest fetch: 9
+
+Total documents currently in Postgres: 30
+
+Total pages currently in Postgres: 121
+
+Replacement NSSH PDF: 28 pages; text extraction verified
+
+Re-parsing the replacement PDF: Pending
+
+Note: The database totals are existing totals, not confirmed D07 parsing totals. Do not use them to calculate parsing coverage until the manifest and parsing results are checked.
+
+2. ## Parsing Failures
+
+Reason
+
+Files
+
+What I did
+
+no_text_layer
+
+1 (original NSSH PDF)
+
+Found an alternative PDF source and downloaded a replacement. Verified that the replacement contains extractable text. Re-parsing is pending.
+
+Original failed file:
+data/raw/scsthub/nssh-guidelines-o-b2cca3c3.pdf
+
+Replacement file:
+data/raw/scsthub/nssh-guidelines-a2ad8a5d.pdf
+
+Replacement verification:
+
+Pages: 28
+
+First-page text extracted successfully.
+
+Document: National Scheduled Caste and Scheduled Tribe Hub (NSSH) guidelines.
+
+Memorandum dated: 15 November 2021.
+
+3. What I Observed in Parsed Pages
+
+Readable extraction:
+
+PM Vishwakarma — page 32: readable headings and text.
+
+PM Vishwakarma — page 57: Markdown grid table.
+
+Important to Know — page 3: readable bullet points.
+
+CGTMSE — pages 2–10: generally readable section content.
+
+Extraction problems:
+
+PM Vishwakarma — page 7: garbled characters.
+
+PM Vishwakarma — page 61: garbled characters and control symbols.
+
+PM Vishwakarma — page 62: empty extracted text.
+
+PM Vishwakarma — page 64: duplicate government/ministry headers.
+
+CGTMSE — page 10: some table columns have generic names such as Col2 and Col4.
+
+Table extraction:
+
+PM Vishwakarma — page 57: Markdown grid table.
+
+CGTMSE — page 10: Markdown table, but column names are partially generic.
+
+4. Parser Choice
+
+PDF parser: PyMuPDF
+
+Reasons:
+
+PM Vishwakarma: 64 pages and 22 extracted tables.
+
+CGTMSE: 37 pages and 14 extracted tables.
+
+FAQ PDF: 7 pages and 1 extracted table.
+
+PyMuPDF successfully extracted text and tables from these PDFs. However, some pages still need better handling because of garbled text, empty pages and imperfect table structures.
+
+5. Document Types That Need Better Handling
+
+Scanned PDFs without a text layer.
+
+PDFs with unusual font encodings.
+
+Complex tables with merged cells or unclear column structures.
+
+6. One Thing That Went Wrong Today
+
+The original NSSH guidelines PDF failed during parsing with the reason no_text_layer.
+
+I searched for an alternative source and downloaded a replacement PDF. The replacement contains 28 pages, and PyMuPDF successfully extracted its first-page text.
+
+Current status: Replacement verified; database re-parsing and failure-resolution confirmation are still pending.
