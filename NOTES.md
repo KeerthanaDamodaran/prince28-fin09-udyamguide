@@ -561,3 +561,45 @@ The unit fixture did not override all the required dependencies.
 7. Fallback was used in 41.18% of recorded calls.
 8. Live URL latency has not yet been measured.
 9. Controlled primary-provider failure and circuit-breaker behaviour still need testing.
+
+## D09 · Prompt versions compared
+
+<!-- prompts:start -->
+
+| Prompt version | Correct | Accuracy | Invalid replies | Avg tokens in |
+|---|---|---|---|---|
+| classify_v1 | 11/20 | 55% | 0 | 110 |
+| classify_v2 | 19/20 | 95% | 0 | 288 |
+| classify_v3 | 19/20 | 95% | 0 | 385 |
+| classify_v4 | 19/20 | 95% | 0 | 403 |
+
+<!-- prompts:end -->
+
+
+### D09 · Prompts and structured output
+
+- **My best router prompt:** `classify_v2` with **19/20 (95%)**.
+- **What I changed in v4, and what happened to the score:** I broadened the `personal` category to include rules and schemes applied to a user's own business circumstances. It fixed line 15 but caused line 5 to be misclassified. The score remained 19/20 (95%), so there was no accuracy improvement over v2.
+- **The question my best version still gets wrong:** Line 15 — expected `personal`, but the earlier version classified it incorrectly. I believe it was difficult because the question involved a scheme or rule applied to a user's own business.
+- **A label in my test set that I changed after seeing the results:** None.
+- **Input tokens per question:** v1: **110**, best version (v2): **288**. The extra tokens are worth it because accuracy improved from 55% to 95%, a 40-percentage-point improvement.
+
+### My contract (DocMeta)
+
+- **Fields I kept from my project card:** `doc_kind`, `year`, `language`, `summary`, `topics`, `scheme`.
+- **Fields I deleted, and why they make no sense per document:** `authority`, `eligibility`, `benefit`, `max_amount`, `enterprise_class`, `effective_from`. I excluded these to keep the initial metadata contract simpler and focus on document classification and scheme-based filtering. These fields can still be useful in a more detailed contract.
+- **The field I tightened, and how:** I tightened `scheme` using a `Literal` type with predefined values such as `PMEGP`, `CGTMSE`, `MUDRA`, `Udyam Registration`, `MSME Samadhaan`, and `ZED Certification`, along with `other`. This prevents arbitrary scheme names.
+
+### Extraction run
+
+- **Prompt version:** `extract_v1` · documents: **5 ok, 0 repaired, 0 failed (of 5 parsed)**.
+- **Not finished? Why, and how many are left:** All 5 pending documents were processed successfully. The retry command found 0 remaining failed documents. If the corpus contains more than these 5 documents, the remaining corpus still needs to be checked.
+- **Most common failure reason, and what I did about it:** No extraction failures occurred, so there was no common failure reason to fix.
+- **A record that was valid but wrong:** Notifications document — `doc_kind` was extracted as `notice`. My assessment is that `guideline` or `rule` may be more appropriate because it describes RBI lending directions. This needs confirmation against the original document.
+- **Cost at list price:** **Rs 0.1387** in total, approximately **Rs 0.02774 per document**.
+
+### One thing that went wrong today, and how I fixed it
+
+My `DocMeta` contract initially failed a unit test because I had accidentally removed the `summary` field. The test expected `summary` to be present, but Pydantic rejected the input. I added `summary` back with its length constraints (`min_length=20`, `max_length=300`) and reran the tests. All **93 tests passed**.
+
+Ruff also reported a formatting issue in `doc_meta.py`. I identified the required formatting command: `uv run ruff format .`.
