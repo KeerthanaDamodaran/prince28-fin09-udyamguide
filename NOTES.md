@@ -345,3 +345,219 @@ The original NSSH guidelines PDF failed during parsing with the reason no_text_l
 I searched for an alternative source and downloaded a replacement PDF. The replacement contains 28 pages, and PyMuPDF successfully extracted its first-page text.
 
 Current status: Replacement verified; database re-parsing and failure-resolution confirmation are still pending.
+
+# D08 · LLM Gateway
+
+## 1. Model Configuration
+
+- **Primary:** `gemini-4-hydrogen` (Google Gemini)
+- **Fallback:** `openai/gpt-oss-20b` (Groq)
+- **Primary API endpoint:** `https://generativelanguage.googleapis.com/v1beta/openai`
+- **Fallback API endpoint:** `https://api.groq.com/openai/v1`
+- **Timeout:** 30 seconds
+- **USD-INR conversion rate:** ₹95 per USD (used for cost estimates)
+- **Configuration verified:** `src/udyamguide/config.py`
+
+## 2. Performance
+
+### First question on my laptop
+
+Question: "What are the current limits for micro, small and medium enterprises?"
+
+- Provider: Gemini
+- Model: `gemini-4-hydrogen`
+- First words after: Not recorded
+- Total time: **22.04 seconds**
+- Input tokens: **217**
+- Output tokens: **177**
+- Estimated cost: **₹0.000000**
+- Attempts: 2
+- Fallback: No
+
+### Question 6
+
+Question: "Will my buyer pay me this month?"
+
+- Provider: Gemini
+- First words after: **7.56 seconds**
+- Total time: **8.78 seconds**
+- Input tokens: **212**
+- Output tokens: **154**
+- Estimated cost: **₹0.000000**
+- Attempts: 1
+- Fallback: No
+
+### Same question on my live URL
+
+- First words after: Not tested yet.
+- Day 1 latency target: **Under 1.5 seconds**.
+
+## 3. Tokens: English Against Tamil
+
+| Message | Input tokens |
+|---|---:|
+| "Hi" (baseline, mostly system prompt) | 205 |
+| English refund sentence | 240 |
+| Same sentence in Tamil | 254 |
+
+**Calculation:**
+
+Tamil / English = 254 / 240 = 1.0583
+
+- Tamil needs approximately **1.06 times** the input tokens of English.
+- Tamil used 14 more tokens, approximately 5.83% more than English in this test.
+
+## 4. What the Model Does Without My Documents
+
+### Question 6: "Will my buyer pay me this month?"
+
+**Did it admit it cannot know?** Yes.
+
+Exact words:
+
+> I am not sure whether your buyer will pay you this month, as I cannot predict a specific buyer's actions or see your invoice details.
+
+It also explained MSME delayed-payment protections, including the maximum 45-day agreed credit period and the MSME Samadhaan portal.
+
+### A detail it got wrong or invented
+
+**Question:** "What are the current limits for micro, small and medium enterprises?"
+
+**What Groq said:**
+
+It returned outdated and incorrect MSME classification figures in repeated tests, including:
+
+- Micro: ₹25 lakh turnover
+- Small: ₹5 crore turnover
+- Medium: ₹10 crore turnover
+
+Other responses also incorrectly used paid-up capital or outdated turnover limits.
+
+**What is correct under the revised MSME classification:**
+
+| Category | Investment limit | Annual turnover limit |
+|---|---:|---:|
+| Micro | ₹2.5 crore | ₹10 crore |
+| Small | ₹25 crore | ₹100 crore |
+| Medium | ₹125 crore | ₹500 crore |
+
+**Observation:** Gemini returned the correct revised classification in the test, whereas Groq produced inconsistent and outdated answers.
+
+### Off-topic question
+
+**English question:** "Explain in one sentence what a refund is."
+
+- Provider: Groq fallback.
+- Response: "I’m sorry, but that question is outside the scope of UdyamGuide."
+- Result: Correctly declined the unrelated question in one sentence.
+
+**Tamil equivalent:**
+
+"பணத்தைத் திரும்பப் பெறுதல் என்றால் என்ன என்பதை ஒரே வாக்கியத்தில் விளக்கவும்."
+
+- Provider: Groq fallback.
+- Result: Answered the unrelated question instead of refusing it.
+
+**Conclusion:** Scope enforcement is inconsistent across languages.
+
+### Additional off-topic test
+
+**Question:** "Who won the 2011 cricket world cup?"
+
+- Provider: Groq fallback.
+- First words after: 33.77 seconds.
+- Total time: 34.20 seconds.
+- Input tokens: 241.
+- Output tokens: 258.
+- Estimated cost: ₹0.009070.
+- Response: "I am not sure."
+
+## 5. Fallback and Circuit Breaker
+
+- **Primary provider:** Gemini (`gemini-4-hydrogen`).
+- **Fallback provider:** Groq (`openai/gpt-oss-20b`).
+- **Fallback observed:** Yes.
+- Groq answered the English refund, Tamil refund, cricket and repeated MSME questions.
+- First words after: 33.77 seconds for the cricket question.
+
+### Controlled failure test
+
+- Deliberately breaking the Gemini primary provider: Not yet confirmed.
+- Fallback response during a deliberate primary failure: Not yet measured.
+- Question number at which "llm call gemini ... error" stopped appearing in logs: Not recorded.
+- Circuit-breaker opening and recovery: Not yet verified.
+
+## 6. The Bill
+
+**Endpoint:** `/v1/usage?days=1`
+
+**Date:** 26 November 2026
+
+| Metric | Result |
+|---|---:|
+| Total calls | 17 |
+| Errors | 7 |
+| Fallbacks | 7 |
+| Input tokens | 2,345 |
+| Output tokens | 2,562 |
+| Estimated total cost | ₹0.073 |
+
+### Average cost per call
+
+₹0.073 / 17 = ₹0.00429
+
+- Average estimated cost per call: **₹0.00429**
+- Equivalent to approximately 0.43 paise per call.
+- Day 1 cost target: Under ₹0.50 per answered question.
+- **Result: PASS**
+
+### Fallback rate
+
+7 / 17 × 100 = 41.18%
+
+- Fallback rate: **41.18%**
+- This needs investigation because a significant proportion of calls used the fallback provider.
+
+**Note:** These are application-reported estimated costs, not confirmation of actual provider billing. Gemini requests displayed ₹0.000000 in the terminal.
+
+## 7. One Thing That Went Wrong Today, and How I Fixed It
+
+### Problem
+
+Initially, several unit tests failed:
+
+- Chat API requests returned HTTP 503.
+- Usage API tests returned HTTP 500.
+- The unit-test client was using the real LLM gateway and usage repository instead of test doubles.
+
+### Root cause
+
+The closer `tests/unit/conftest.py` fixture took precedence over the root `tests/conftest.py` fixture.
+
+The unit fixture did not override all the required dependencies.
+
+### Fix
+
+- Imported `get_gateway` and `LLMGateway`.
+- Added a fake LLM gateway using `LLMGateway([llm])`.
+- Imported `get_usage_repo`.
+- Added a `FakeUsage` repository.
+- Added dependency overrides for the gateway and usage repository in the unit-test client fixture.
+
+### Result
+
+- All 7 chat API tests passed.
+- All 78 unit tests passed.
+
+
+## 8. Day 1 Overall Observations
+
+1. Gemini successfully answered the tested MSME classification question with the revised limits.
+2. Groq fallback produced inconsistent and outdated MSME information.
+3. English off-topic refusal worked, but the Tamil equivalent was answered.
+4. The model correctly admitted it could not predict whether a specific buyer would pay.
+5. Usage tracking successfully reported calls, errors, fallbacks, tokens and estimated cost.
+6. Average estimated cost per call was comfortably below the ₹0.50 target.
+7. Fallback was used in 41.18% of recorded calls.
+8. Live URL latency has not yet been measured.
+9. Controlled primary-provider failure and circuit-breaker behaviour still need testing.
