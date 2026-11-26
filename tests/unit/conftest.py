@@ -1,9 +1,29 @@
+# import pytest
+# from fastapi.testclient import TestClient
+
+# #from udyamguide.api.deps import check_db, get_repo, get_usage_repo
+# from udyamguide.api.deps import (
+#     check_db,
+#     get_gateway,
+#     get_repo,
+#     get_usage_repo,
+# )
+# from udyamguide.llm.gateway import LLMGateway
+# from udyamguide.api.main import create_app
+# from udyamguide.config import Settings
+
 import pytest
 from fastapi.testclient import TestClient
 
-from udyamguide.api.deps import check_db, get_repo
+from udyamguide.api.deps import (
+    check_db,
+    get_gateway,
+    get_repo,
+    get_usage_repo,
+)
 from udyamguide.api.main import create_app
 from udyamguide.config import Settings
+from udyamguide.llm.gateway import LLMGateway
 
 # Tiny fake records: unit tests never touch a real database or your data file.
 SAMPLE = [
@@ -43,10 +63,50 @@ def db_state():
     return {"up": True}
 
 
-@pytest.fixture
+"""@pytest.fixture
 def client(settings, db_state):
     app = create_app(settings)
     app.dependency_overrides[get_repo] = lambda: FakeRepo(SAMPLE)
     app.dependency_overrides[check_db] = lambda: db_state["up"]
+    with TestClient(app) as c:
+        yield c"""
+
+
+class FakeUsage:
+    async def by_day(self, days=7):
+        return [
+            {
+                "day": "2026-11-25",
+                "calls": 3,
+                "errors": 1,
+                "fallbacks": 1,
+                "tokens_in": 300,
+                "tokens_out": 120,
+                "cost_inr": 0.0642,
+            }
+        ]
+
+
+# @pytest.fixture
+# def client(settings, db_state):
+#     app = create_app(settings)
+
+#     app.dependency_overrides[get_repo] = lambda: FakeRepo(SAMPLE)
+#     app.dependency_overrides[check_db] = lambda: db_state["up"]
+#     app.dependency_overrides[get_usage_repo] = lambda: FakeUsage()
+
+#     with TestClient(app) as c:
+#         yield c
+
+
+@pytest.fixture
+def client(settings, db_state, llm):
+    app = create_app(settings)
+
+    app.dependency_overrides[get_repo] = lambda: FakeRepo(SAMPLE)
+    app.dependency_overrides[check_db] = lambda: db_state["up"]
+    app.dependency_overrides[get_gateway] = lambda: LLMGateway([llm])
+    app.dependency_overrides[get_usage_repo] = lambda: FakeUsage()
+
     with TestClient(app) as c:
         yield c

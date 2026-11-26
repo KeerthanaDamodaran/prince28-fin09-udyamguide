@@ -7,9 +7,11 @@ from fastapi import APIRouter, FastAPI
 
 from udyamguide.api.errors import register_error_handlers
 from udyamguide.api.middleware import request_context
-from udyamguide.api.routes import documents, health
+from udyamguide.api.routes import chat, documents, health
 from udyamguide.config import Settings, get_settings
+from udyamguide.db.llm_calls import make_recorder
 from udyamguide.db.session import make_engine, make_sessionmaker
+from udyamguide.llm.gateway import build_gateway
 from udyamguide.logging_setup import setup_logging
 
 logger = logging.getLogger("udyamguide")
@@ -30,12 +32,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.engine = engine
     app.state.sessionmaker = make_sessionmaker(engine)
+    app.state.system_prompt = chat.load_prompt(settings.prompts_dir)  # missing file: no start
+    app.state.gateway = build_gateway(settings, make_recorder(app.state.sessionmaker))
 
     app.middleware("http")(request_context)
     register_error_handlers(app)
 
     v1 = APIRouter(prefix="/v1")
     v1.include_router(documents.router)
+    v1.include_router(chat.router)
     app.include_router(health.router)
     app.include_router(v1)
     return app
