@@ -236,115 +236,137 @@ Crawling restrictions were checked by the collector before fetching pages.
 
 The CGTMSE sitemap was malformed and couldn't be parsed. Instead of repeatedly retrying it, I switched to collecting documents through verified individual URLs and manual collection, while respecting website restrictions.
 
-## D07 · Parsing My Corpus
 
-1. ## Current Dataset Status
+# D07 · Parsing My Corpus
 
-Source entries in data/sources.csv: 10
+## 1. Current Dataset Status
 
-Files downloaded in the latest fetch: 1
+- Source entries in `data/sources.csv`: 10
+- PDF files found in `data/raw`: 11
+- PDF parser comparison: 11 PDFs × 2 parsers = 22 runs
+- Successful text-parser runs: 20
+- Text-parser failures: 2 (both on the scanned NSSH PDF)
+- OCR recovery: 1 PDF successfully parsed, 7 pages
+- Pages extracted by text parsers: 240
+- Additional pages recovered through OCR: 7
+- Total successfully processed pages: 247
 
-Files skipped in the latest fetch: 9
+## 2. Parser Comparison
 
-Total documents currently in Postgres: 30
+Compared PyMuPDF and pypdf on all 11 PDFs available in the local MSME corpus.
 
-Total pages currently in Postgres: 121
+| Document | Pages | PyMuPDF chars | pypdf chars | PyMuPDF tables | Result |
+|---|---:|---:|---:|---:|---|
+| CGTMSE | 37 | 114757 | 69771 | 14 | Both OK |
+| PM Vishwakarma | 64 | 79663 | 120598 | 22 | Both OK |
+| PMEGP Delhi | 7 | 19399 | 17668 | 3 | Both OK |
+| PMEGP Kerala | 43 | 98339 | 94469 | 11 | Both OK |
+| eGazette | 2 | 2027 | 1889 | 0 | Both OK |
+| MSMED Act | 12 | 35217 | 35137 | 0 | Both OK |
+| RBI Micro | 7 | 20671 | 20486 | 1 | Both OK |
+| Ricago | 8 | 21088 | 21400 | 0 | Both OK |
+| NSSH text-readable copy | 28 | 56900 | 55810 | 0 | Both OK |
+| NSSH scanned copy | — | — | — | — | Both failed: no_text_layer |
+| ZED guidelines | 32 | 44785 | 43159 | 9 | Both OK |
 
-Replacement NSSH PDF: 28 pages; text extraction verified
+### Results
 
-Re-parsing the replacement PDF: Pending
+- 11 PDFs tested using two parsers.
+- 10 PDFs successfully parsed by both PyMuPDF and pypdf.
+- Both parsers reported `no_text_layer` for the scanned NSSH PDF.
+- PyMuPDF extracted 60 tables across the 10 text-readable PDFs.
+- pypdf extracted no tables in this comparison.
+- All 20 successful text-parser runs completed without parser errors.
 
-Note: The database totals are existing totals, not confirmed D07 parsing totals. Do not use them to calculate parsing coverage until the manifest and parsing results are checked.
+### Observations
 
-2. ## Parsing Failures
+- PM Vishwakarma contains 22 extracted tables with PyMuPDF.
+- CGTMSE contains 14 extracted tables.
+- PMEGP Kerala contains 11 extracted tables.
+- ZED contains 9 extracted tables.
+- PMEGP Delhi contains 3 extracted tables.
+- RBI Micro contains 1 extracted table.
+- pypdf extracted more characters from PM Vishwakarma, showing that character count alone is not sufficient to judge extraction quality.
 
-Reason
+**Limitations:** Character counts measure extracted text volume, not semantic accuracy. Table counts indicate detected tables, not verified table correctness.
 
-Files
+## 3. Parsing Failures and OCR Recovery
 
-What I did
+The scanned NSSH PDF did not contain a usable text layer. Both PyMuPDF and pypdf returned `no_text_layer`.
 
-no_text_layer
+I installed Tesseract OCR and verified that the English language pack was available.
 
-1 (original NSSH PDF)
+I retried parsing using:
 
-Found an alternative PDF source and downloaded a replacement. Verified that the replacement contains extractable text. Re-parsing is pending.
+```powershell
+uv run python scripts/parse_corpus.py --retry-failed --ocr eng
+```
 
-Original failed file:
-data/raw/scsthub/nssh-guidelines-o-b2cca3c3.pdf
+Result:
 
-Replacement file:
-data/raw/scsthub/nssh-guidelines-a2ad8a5d.pdf
+- Files detected: 12
+- Already parsed: 11
+- Newly parsed: 1
+- Pages parsed: 7
+- Database verification: 7 pages stored
+- Parser: `ocr-eng`
+- Remaining parse failures: None for the recovered document
 
-Replacement verification:
+### NSSH files
 
-Pages: 28
+1. Text-readable NSSH PDF:
+   `data/raw/scsthub/nssh-guidelines-a2ad8a5d.pdf`
+   - 28 pages
+   - Successfully parsed by PyMuPDF and pypdf.
 
-First-page text extracted successfully.
+2. Scanned NSSH PDF:
+   `data/raw/scsthub/nssh-guidelines-o-b2cca3c3.pdf`
+   - 7 pages
+   - Initially failed with `no_text_layer`.
+   - Successfully recovered using Tesseract OCR.
+   - All 7 pages verified in the database.
 
-Document: National Scheduled Caste and Scheduled Tribe Hub (NSSH) guidelines.
+## 4. Parser Choice
 
-Memorandum dated: 15 November 2021.
-
-3. What I Observed in Parsed Pages
-
-Readable extraction:
-
-PM Vishwakarma — page 32: readable headings and text.
-
-PM Vishwakarma — page 57: Markdown grid table.
-
-Important to Know — page 3: readable bullet points.
-
-CGTMSE — pages 2–10: generally readable section content.
-
-Extraction problems:
-
-PM Vishwakarma — page 7: garbled characters.
-
-PM Vishwakarma — page 61: garbled characters and control symbols.
-
-PM Vishwakarma — page 62: empty extracted text.
-
-PM Vishwakarma — page 64: duplicate government/ministry headers.
-
-CGTMSE — page 10: some table columns have generic names such as Col2 and Col4.
-
-Table extraction:
-
-PM Vishwakarma — page 57: Markdown grid table.
-
-CGTMSE — page 10: Markdown table, but column names are partially generic.
-
-4. Parser Choice
-
-PDF parser: PyMuPDF
+I selected PyMuPDF as the primary PDF parser.
 
 Reasons:
 
-PM Vishwakarma: 64 pages and 22 extracted tables.
+- It extracted 60 tables across the 10 text-readable PDFs.
+- It provided useful table extraction for CGTMSE, PM Vishwakarma, PMEGP Delhi, PMEGP Kerala, RBI Micro and ZED.
+- It extracted more characters than pypdf from several documents, including CGTMSE, RBI Micro, NSSH and ZED.
+- pypdf extracted more characters from PM Vishwakarma, so character count alone cannot determine parser quality.
+- pypdf remains available as a fallback for text extraction.
+- Scanned PDFs require a separate OCR fallback.
 
-CGTMSE: 37 pages and 14 extracted tables.
+## 5. What I Observed
 
-FAQ PDF: 7 pages and 1 extracted table.
+- PyMuPDF provides useful table extraction for MSME policy documents.
+- pypdf successfully extracts text but did not detect tables in this comparison.
+- Parser output varies by document, so extraction quality should be evaluated using more than character counts.
+- Scanned PDFs without a text layer cannot be processed by ordinary text extraction.
+- Tesseract OCR successfully recovered the scanned NSSH document.
+- The OCR output was stored as seven database pages.
 
-PyMuPDF successfully extracted text and tables from these PDFs. However, some pages still need better handling because of garbled text, empty pages and imperfect table structures.
+## 6. One Thing That Went Wrong and How I Fixed It
 
-5. Document Types That Need Better Handling
+The scanned NSSH PDF initially failed with `no_text_layer` when processed using both PyMuPDF and pypdf.
 
-Scanned PDFs without a text layer.
+I installed Tesseract OCR, checked that the English language pack was available, and retried parsing with OCR enabled.
 
-PDFs with unusual font encodings.
+The document was successfully processed using `ocr-eng`. All seven pages were stored in the database, and the corresponding parse failure was resolved.
 
-Complex tables with merged cells or unclear column structures.
+## 7. Final D07 Outcome
 
-6. One Thing That Went Wrong Today
+- Implemented PDF parsing using PyMuPDF and pypdf.
+- Added page-level extraction with page numbers, heading paths and Markdown table support.
+- Added parse failure tracking through the `parse_failures` migration.
+- Compared two PDF parsers across 11 MSME PDFs.
+- Documented extraction quality and parser limitations.
+- Implemented and verified OCR recovery for a scanned NSSH PDF.
+- Verified that the recovered OCR pages were stored in the database.
 
-The original NSSH guidelines PDF failed during parsing with the reason no_text_layer.
-
-I searched for an alternative source and downloaded a replacement PDF. The replacement contains 28 pages, and PyMuPDF successfully extracted its first-page text.
-
-Current status: Replacement verified; database re-parsing and failure-resolution confirmation are still pending.
+**Conclusion:** D07 parsing implementation, parser comparison, failure tracking and OCR recovery have been completed.
 
 # D08 · LLM Gateway
 
