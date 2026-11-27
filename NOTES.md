@@ -614,11 +614,11 @@ The unit fixture did not override all the required dependencies.
 
 ### Extraction run
 
-- **Prompt version:** `extract_v1` · documents: **5 ok, 0 repaired, 0 failed (of 5 parsed)**.
-- **Not finished? Why, and how many are left:** All 5 pending documents were processed successfully. The retry command found 0 remaining failed documents. If the corpus contains more than these 5 documents, the remaining corpus still needs to be checked.
+- **Prompt version**:  extract_v1 · 17 successful, 0 repaired, 0 failed (of 17 eligible documents).
+- **Not finished? Why, and how many are left**: All 17 eligible documents in the database have been processed successfully using extract_v1. There are 0 remaining eligible documents pending extraction. The replacement scanned National SC-ST Hub Guidelines PDF was also successfully processed using OCR (ocr-eng), covering 7 pages.
 - **Most common failure reason, and what I did about it:** No extraction failures occurred, so there was no common failure reason to fix.
-- **A record that was valid but wrong:** Notifications document — `doc_kind` was extracted as `notice`. My assessment is that `guideline` or `rule` may be more appropriate because it describes RBI lending directions. This needs confirmation against the original document.
-- **Cost at list price:** **Rs 0.1387** in total, approximately **Rs 0.02774 per document**.
+- **A record that I initially suspected was wrong:** RBI Master MSME Notifications page — `doc_kind` was extracted as `notice`. After inspecting the original HTML and extracted page text, I confirmed that it is a listing of RBI circulars and notifications, rather than the full Master Direction itself. Therefore, `notice` is a defensible classification, and I kept it unchanged.
+- **Cost at list price:** **Rs 0.3445** in total across the 17-document extraction corpus, approximately **Rs 0.02027 per document**.
 
 ### One thing that went wrong today, and how I fixed it
 
